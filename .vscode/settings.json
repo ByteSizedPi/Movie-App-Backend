@@ -1,0 +1,4 @@
+{
+  "appService.defaultWebAppToDeploy": "/subscriptions/4f5e0872-a971-48cd-8565-40098dd298f2/microsoft.web/sites/subscriptions/4f5e0872-a971-48cd-8565-40098dd298f2/resourceGroups/MovieApp/providers/Microsoft.Web/sites/MovieStreamingAPI",
+  "appService.deploySubpath": "."
+}
