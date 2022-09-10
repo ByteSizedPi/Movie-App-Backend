@@ -18,7 +18,7 @@ const getUserByBody = async (req, res, next) =>
   getUserUtility(req, res, next, "body");
 
 const isValidNewUser = (req, res, next) => {
-  if (res.user) return res.send({ error: "user already exists" });
+  // if (res.user) return res.send({ error: "user already exists" });
   if (!req.body.username || req.body.username.length < 6)
     return res.send({ error: "username must be longer than 6 characters" });
   if (!req.body.password || req.body.password.length < 6)

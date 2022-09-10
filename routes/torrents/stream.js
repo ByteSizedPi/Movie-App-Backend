@@ -1,8 +1,12 @@
 var webtorrent = require("webtorrent");
 const client = new webtorrent();
 
+let STREAM;
+
 const buildMagnetURI = (infoHash) =>
-  "magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F&xs=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2Fsintel.torrent";
+  "magnet:?xt=urn:btih:" +
+  infoHash +
+  "&tr=udp://glotorrents.pw:6969/announce&tr=udp://tracker.opentrackr.org:1337/announce&tr=udp://torrent.gresille.org:80/announce&tr=udp://tracker.openbittorrent.com:80&tr=udp://tracker.coppersurfer.tk:6969&tr=udp://tracker.leechers-paradise.org:6969&tr=udp://p4p.arenabg.ch:1337&tr=udp://tracker.internetwarriors.net:1337&tr=wss://tracker.openwebtorrent.com";
 
 const addInfoHash = (infoHash, res) => {
   if (!infoHash) {
@@ -16,7 +20,7 @@ const addInfoHash = (infoHash, res) => {
 
   try {
     client.add(torrent, () => {
-      console.log(infoHash + "added successfully!");
+      console.log(infoHash + " added successfully!");
       res.status(201).send({ msg: "Hash added successfully!" });
     });
   } catch (err) {
@@ -31,7 +35,11 @@ const stream = ({ params: { infoHash }, headers: { range } }, res) => {
   }
 
   // try {
-  const torrent = client.get(buildMagnetURI(infoHash));
+  const torrent = client.get(infoHash);
+  if (!torrent) {
+    res.status(400).json({ error: "torrent could not be added" });
+    return;
+  }
   var file = torrent.files.find(({ name }) => name.endsWith(".mp4"));
   var total = file.length;
 
@@ -47,7 +55,7 @@ const stream = ({ params: { infoHash }, headers: { range } }, res) => {
     var end = total;
   }
 
-  var stream = file.createReadStream({ start: start, end: end });
+  var STREAM = file.createReadStream({ start: start, end: end });
 
   res.writeHead(206, {
     "Content-Range": "bytes " + start + "-" + end + "/" + total,
@@ -56,7 +64,8 @@ const stream = ({ params: { infoHash }, headers: { range } }, res) => {
     "Content-Type": "video/mp4",
   });
   console.log("stream ready");
-  stream.pipe(res);
+  STREAM.pipe(res);
+  STREAM.on("close", () => console.log("stream ended"));
   // } catch (err) {
   //   res.status(500).send("Error: " + err.toString());
   // }

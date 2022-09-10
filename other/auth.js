@@ -1,9 +1,17 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const { serialize } = require("cookie");
 
 //middleware
 const generateToken = ({ body: { username } }, res, next) => {
-  res.json({ token: jwt.sign({ user: username }, "secret") });
+  const token = jwt.sign({ user: username }, "secret");
+  const serialized = serialize("token", token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+  });
+  res.setHeader("Set-Cookie", serialized);
+  res.json({ token: token });
 };
 
 const authRequest = (req, res, next) => {
@@ -19,7 +27,8 @@ const authRequest = (req, res, next) => {
 };
 
 const userExists = async (req, res, next) => {
-  if (!req.body.username) res.status(400).json("no credentials provided");
+  if (!req.body.username)
+    return res.status(400).json("no credentials provided");
   try {
     const results = await User.find({ username: req.body.username });
     if (!results[0]) return res.status(404).json("user not found");

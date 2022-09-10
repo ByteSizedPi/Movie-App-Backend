@@ -1,10 +1,134 @@
 const router = require("express").Router();
-const { addInfoHash, stream } = require("./stream");
+var webtorrent = require("webtorrent");
+const client = new webtorrent();
 
-router.get("/add/:infoHash", (req, res) =>
-  addInfoHash(req.params.infoHash, res)
+let STREAM = undefined;
+
+const buildMagnetURI = (infoHash) =>
+  "magnet:?xt=urn:btih:" +
+  infoHash +
+  "&tr=udp://glotorrents.pw:6969/announce&tr=udp://tracker.opentrackr.org:1337/announce&tr=udp://torrent.gresille.org:80/announce&tr=udp://tracker.openbittorrent.com:80&tr=udp://tracker.coppersurfer.tk:6969&tr=udp://tracker.leechers-paradise.org:6969&tr=udp://p4p.arenabg.ch:1337&tr=udp://tracker.internetwarriors.net:1337&tr=wss://tracker.openwebtorrent.com";
+
+router.get("/add/:infoHash", ({ params: { infoHash } }, res) => {
+  const torrent = buildMagnetURI(infoHash);
+
+  try {
+    if (client.get(torrent)) {
+      res.status(201).send({ msg: "Hash added successfully!" });
+      return;
+    }
+
+    client.add(torrent, () => {
+      console.log("torrent added");
+      res.status(201).send({ msg: "Hash added successfully!" });
+    });
+  } catch (err) {
+    res.status(500).send("Error: " + err.toString());
+  }
+});
+
+router.get(
+  "/stream/:infoHash",
+  ({ params: { infoHash }, headers: { range } }, res) => {
+    // try {
+    const torrent = client.get(infoHash);
+    if (!torrent) {
+      res.status(400).json({ error: "torrent could not be added" });
+      return;
+    }
+    var file = torrent.files.find(({ name }) => name.endsWith(".mp4"));
+    var total = file.length;
+
+    if (typeof range != "undefined") {
+      var parts = range.replace(/bytes=/, "").split("-");
+      var partialstart = parts[0];
+      var partialend = parts[1];
+      var start = parseInt(partialstart, 10);
+      var end = partialend ? parseInt(partialend, 10) : total - 1;
+      var chunksize = end - start + 1;
+    } else {
+      var start = 0;
+      var end = total;
+    }
+
+    STREAM = file.createReadStream({ start: start, end: end });
+
+    res.writeHead(206, {
+      "Content-Range": "bytes " + start + "-" + end + "/" + total,
+      "Accept-Ranges": "bytes",
+      "Content-Length": chunksize,
+      "Content-Type": "video/mp4",
+    });
+    console.log("stream ready");
+    STREAM.pipe(res);
+    res.on("close", () => console.log("stream ended"));
+    // } catch (err) {
+    //   res.status(500).send("Error: " + err.toString());
+    // }
+  }
 );
 
-router.get("/stream/:infoHash", (req, res) => stream(req, res));
+// const addInfoHash = (infoHash, res) => {
+//   if (!infoHash) {
+//     res.status(400).send("Missing infoHash parameter!");
+//     return;
+//   }
+
+//   const torrent = buildMagnetURI(infoHash);
+
+//   if (client.get(torrent)) client.remove(torrent);
+
+//   try {
+//     client.add(torrent, () => {
+//       console.log(infoHash + " added successfully!");
+//       res.status(201).send({ msg: "Hash added successfully!" });
+//     });
+//   } catch (err) {
+//     res.status(500).send("Error: " + err.toString());
+//   }
+// };
+
+// const stream = ({ params: { infoHash }, headers: { range } }, res) => {
+//   if (!infoHash) {
+//     res.status(400).send("Missing infoHash parameter!");
+//     return;
+//   }
+
+//   // try {
+//   const torrent = client.get(infoHash);
+//   if (!torrent) {
+//     res.status(400).json({ error: "torrent could not be added" });
+//     return;
+//   }
+//   var file = torrent.files.find(({ name }) => name.endsWith(".mp4"));
+//   var total = file.length;
+
+//   if (typeof range != "undefined") {
+//     var parts = range.replace(/bytes=/, "").split("-");
+//     var partialstart = parts[0];
+//     var partialend = parts[1];
+//     var start = parseInt(partialstart, 10);
+//     var end = partialend ? parseInt(partialend, 10) : total - 1;
+//     var chunksize = end - start + 1;
+//   } else {
+//     var start = 0;
+//     var end = total;
+//   }
+
+//   var stream = file.createReadStream({ start: start, end: end });
+
+//   res.writeHead(206, {
+//     "Content-Range": "bytes " + start + "-" + end + "/" + total,
+//     "Accept-Ranges": "bytes",
+//     "Content-Length": chunksize,
+//     "Content-Type": "video/mp4",
+//   });
+//   console.log("stream ready");
+//   stream.pipe(res);
+//   stream.on("close", () => console.log("stream ended"));
+//   // } catch (err) {
+//   //   res.status(500).send("Error: " + err.toString());
+//   // }
+// };
 
 module.exports = router;

@@ -24,7 +24,7 @@ const config = () => {
   });
 
   const db = mongoose.connection;
-  db.on("error", (err) => console.log("database not running"));
+  db.on("error", console.error.bind(console, "MongoDB connection error:"));
   db.once("open", () => console.log("connected to database"));
 };
 
