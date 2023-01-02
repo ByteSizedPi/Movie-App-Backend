@@ -32,11 +32,12 @@ const type = ({
   return [];
 };
 
-const search = (queryGroup) =>
-  httpGet(`list_movies.jsonp?query_term=${queryGroup}`).pipe(
+const search = (queryGroup) => {
+  return httpGet(`list_movies.jsonp?query_term=${queryGroup}`).pipe(
     switchMap((arr) => arr),
     mergeMap(({ id }) => getById(id))
   );
+};
 
 const getMovieByIMDBId = (id) =>
   httpGet(`movie_details.jsonp?imdb_id=${id}`).pipe(
