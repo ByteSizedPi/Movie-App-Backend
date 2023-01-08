@@ -8,7 +8,7 @@ import {
   switchMap,
   tap,
 } from "rxjs/operators";
-import { YTS_BASE_URL } from "../../other/other";
+import { YTS_BASE_URL, fetch } from "../../other/other";
 
 // type definitions
 type YTSMovie = {
@@ -50,21 +50,22 @@ type YTSResponse = {
 //makes request to YTS API and map to movies Array using type()
 function httpGet(apiPath: string): Observable<YTSMovie[]> {
   const url = YTS_BASE_URL + apiPath;
+  // return fetch<YTSResponse>(url).pipe(map(type));
   return from(http.get(url)).pipe(
     map(type),
     catchError(() => [])
   );
 }
 
-function type({
+const type = ({
   data: {
     data: { movie, movies },
   },
-}: YTSResponse): YTSMovie[] {
+}: YTSResponse): YTSMovie[] => {
   if (movies) return movies;
   if (movie) return [movie];
   return [];
-}
+};
 
 // api calls
 const getById = (id: number): Observable<YTSMovie> =>

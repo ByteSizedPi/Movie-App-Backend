@@ -1,5 +1,5 @@
 import http from "axios";
-import { forkJoin, from, Observable } from "rxjs";
+import { forkJoin, from, Observable, of } from "rxjs";
 import {
   catchError,
   filter,
@@ -8,7 +8,7 @@ import {
   switchMap,
   tap,
 } from "rxjs/operators";
-import { API_KEY, TMDB_BASE_URL } from "../../other/other";
+import { API_KEY, TMDB_BASE_URL, fetch } from "../../other/other";
 
 const KEY = `api_key=${API_KEY}`;
 const LANG = "&language=en-US";
@@ -63,11 +63,7 @@ const httpGet = (
   imdb: string = ""
 ): Observable<TMDBMovie[]> => {
   const url = TMDB_BASE_URL + apiString + KEY + LANG + imdb;
-  // console.log(url, http.get(url));
-  return from(http.get(url)).pipe(
-    map((res) => type(res)),
-    catchError(() => [])
-  );
+  return fetch<TMDBResponse>(url).pipe(map(type));
 };
 
 //additional get requests for movie related queries

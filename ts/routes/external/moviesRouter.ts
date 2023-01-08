@@ -11,7 +11,7 @@ import {
 } from "./movies";
 
 const router = Router();
-const cache = new NodeCache({ stdTTL: 60 * 5, checkperiod: 60 * 5 });
+const cache = new NodeCache({ stdTTL: 60 * 200, checkperiod: 60 * 200 });
 
 const sendMovies = (
   obs: Observable<Movie[]>,

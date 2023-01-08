@@ -1,3 +1,7 @@
+import http from "axios";
+import { from, Observable, of, map, catchError, tap } from "rxjs";
+import { Movie } from "../routes/external/movies";
+
 const API_KEY = process.env.API_KEY;
 const TMDB_BASE_URL = "https://api.themoviedb.org/3/";
 const YTS_BASE_URL = "https://yts.torrentbay.to/api/v2/";
@@ -12,4 +16,12 @@ export {
   IMG_URL,
   posterSizes,
   backdrop_sizes,
+};
+
+export const fetch = <T>(url: string): Observable<T> => {
+  try {
+    return from(<Promise<T>>http.get(url));
+  } catch (err) {
+    return of();
+  }
 };
