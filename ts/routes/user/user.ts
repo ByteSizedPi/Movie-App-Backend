@@ -1,5 +1,5 @@
+import { NextFunction, Request, Response } from "express";
 import User from "../../models/User";
-import { Request, Response, NextFunction } from "express";
 
 //middleware
 const getUserUtility = async (
@@ -11,6 +11,7 @@ const getUserUtility = async (
   try {
     const results = await User.find({ username: req[part].username });
     res.user = results[0];
+
     next();
   } catch (err) {
     res.status(500).send({ error: err.message });

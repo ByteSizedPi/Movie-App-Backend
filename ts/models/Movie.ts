@@ -1,18 +1,18 @@
-import { model, Schema } from "mongoose";
+import { Schema } from "mongoose";
 
-const providerSchema = new Schema({
+const Provider = new Schema({
   logo_path: { type: String },
   provider_name: { type: String },
 });
 
-const castSchema = new Schema({
+const Cast = new Schema({
   name: { type: String },
   character_name: { type: String },
   url_small_image: { type: String },
   imdb_code: { type: String },
 });
 
-const torrentSchema = new Schema({
+const Torrent = new Schema({
   url: { type: String },
   hash: { type: String },
   quality: { type: String },
@@ -25,7 +25,7 @@ const torrentSchema = new Schema({
   date_uploaded_unix: { type: Number },
 });
 
-const reviewSchema = new Schema({
+const Review = new Schema({
   author: { type: String },
   author_details: {
     type: new Schema({
@@ -42,7 +42,7 @@ const reviewSchema = new Schema({
   url: { type: String },
 });
 
-const movieSchema = new Schema({
+const Movie = new Schema({
   yts_id: { type: Number },
   tmdb_id: { type: Number },
   imdb_id: { type: Number },
@@ -52,7 +52,7 @@ const movieSchema = new Schema({
   genres: { type: [String] },
   language: { type: String },
   mpa_rating: { type: String },
-  providers: { type: [providerSchema] },
+  providers: { type: [Provider] },
 
   runtime: { type: Number },
   rating: { type: Number },
@@ -65,9 +65,9 @@ const movieSchema = new Schema({
   poster: { type: String },
   backdrop: { type: String },
 
-  reviews: { type: [reviewSchema] },
-  cast: { type: [castSchema] },
-  torrents: { type: [torrentSchema] },
+  reviews: { type: [Review] },
+  cast: { type: [Cast] },
+  torrents: { type: [Torrent] },
 });
 
-export default model("Movie", movieSchema);
+export default Movie;

@@ -1,13 +1,12 @@
+import { serialize } from "cookie";
+import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/User";
-import { Request, Response, NextFunction } from "express";
-import { serialize } from "cookie";
-
 //middleware
 const generateToken = (
   { body: { username } }: Request,
   res: Response,
-  next: NextFunction
+  next?: NextFunction
 ) => {
   const token = jwt.sign({ user: username }, "secret");
   const serialized = serialize("token", token, {
@@ -34,8 +33,8 @@ const authRequest = (req: Request, res: AuthResponse, next: NextFunction) => {
 };
 
 const userExists = async (
-  { body: username }: Request,
-  res: AuthResponse,
+  { body: { username } }: Request,
+  res: Response,
   next: NextFunction
 ) => {
   if (!username) return res.status(400).json("no credentials provided");
@@ -49,3 +48,4 @@ const userExists = async (
 };
 
 export { userExists, generateToken, authRequest };
+// export { generateToken, authRequest };

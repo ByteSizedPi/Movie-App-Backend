@@ -1,6 +1,6 @@
 import http from "axios";
-import { from, Observable, of, map, catchError, tap } from "rxjs";
-import { Movie } from "../routes/external/movies";
+import { from, Observable } from "rxjs";
+import { catchError } from "rxjs/operators";
 
 const API_KEY = process.env.API_KEY;
 const TMDB_BASE_URL = "https://api.themoviedb.org/3/";
@@ -19,9 +19,15 @@ export {
 };
 
 export const fetch = <T>(url: string): Observable<T> => {
-  try {
-    return from(<Promise<T>>http.get(url));
-  } catch (err) {
-    return of();
-  }
+  return from(<Promise<T>>http.get(url)).pipe(
+    catchError((err) => {
+      console.log("uh oh error");
+      return from([]);
+    })
+  );
+  // try {
+  //   return from(<Promise<T>>http.get(url));
+  // } catch (err) {
+  //   return of();
+  // }
 };

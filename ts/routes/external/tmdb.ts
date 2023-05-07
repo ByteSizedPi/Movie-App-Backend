@@ -1,14 +1,7 @@
 import http from "axios";
-import { forkJoin, from, Observable, of } from "rxjs";
-import {
-  catchError,
-  filter,
-  map,
-  mergeMap,
-  switchMap,
-  tap,
-} from "rxjs/operators";
-import { API_KEY, TMDB_BASE_URL, fetch } from "../../other/other";
+import { forkJoin, from, Observable } from "rxjs";
+import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import { API_KEY, fetch, TMDB_BASE_URL } from "../../other/other";
 
 const KEY = `api_key=${API_KEY}`;
 const LANG = "&language=en-US";
@@ -75,9 +68,7 @@ const httpGetReviews = (apiString: string): Observable<Review[]> =>
 
 const httpGetProviders = (apiString: string): Observable<Provider[]> =>
   from(http.get(TMDB_BASE_URL + apiString + KEY)).pipe(
-    map(({ data: { results } }) =>
-      results.US?.flatrate ? results.US?.flatrate : []
-    ),
+    map(({ data: { results } }) => results.US?.flatrate ?? []),
     catchError(() => [])
   );
 
@@ -122,9 +113,7 @@ const getById = (id: number): Observable<TMDBMovie> => {
 
 //when searched by imdb_id, since limited results are returned, pass to getById for full results
 const getMovieByIMDBId = (id: string): Observable<TMDBMovie> => {
-  // console.log(id);
   return httpGet(`find/${id}?`, "&external_source=imdb_id").pipe(
-    // tap((r) => console.log(r)),
     switchMap(([{ id }]) => getById(id))
   );
 };

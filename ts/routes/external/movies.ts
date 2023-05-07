@@ -3,7 +3,7 @@ import * as TMDB from "./tmdb";
 import * as YTS from "./yts";
 
 import { Observable } from "rxjs";
-import { finalize, map, mergeMap, tap, toArray } from "rxjs/operators";
+import { finalize, last, map, mergeMap, tap, toArray } from "rxjs/operators";
 
 type Review = {
   author: string;
@@ -100,7 +100,11 @@ const getYTS_TMDB = (f1: YTSFunc, f2: TMDBFunc): Observable<Movie[]> => {
 
   return f1().pipe(
     tap((_) => ++ytsCount),
-    finalize(() => Log.yts(ytsCount, start)),
+    last((_) => {
+      Log.yts(ytsCount, start);
+      return true;
+    }),
+    // finalize(() => Log.yts(ytsCount, start)),
     mergeMap((yts) =>
       f2(yts).pipe(
         tap((_) => ++tmdbCount),
@@ -120,6 +124,7 @@ const getTMDB_YTS = (f1: TMDBFunc, f2: YTSFunc): Observable<Movie[]> => {
   return f1().pipe(
     tap((_) => ++tmdbCount),
     finalize(() => Log.tmdb(tmdbCount, start)),
+
     mergeMap((tmdb) =>
       f2(tmdb).pipe(
         tap((_) => ++ytsCount),

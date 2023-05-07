@@ -1,7 +1,6 @@
 import { Request, Response, Router } from "express";
 import NodeCache from "node-cache";
 import { Observable } from "rxjs";
-import * as Log from "../../other/logs";
 import {
   getMovieGroup,
   getRecommended,
@@ -18,9 +17,7 @@ const sendMovies = (
   req: Request,
   res: Response<Movie[]>
 ) => {
-  Log.request(req.url);
   const cached = cache.has(req.url);
-
   if (cached) return res.send(cache.get(req.url));
 
   obs.subscribe(

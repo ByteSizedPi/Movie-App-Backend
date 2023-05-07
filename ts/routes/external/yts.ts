@@ -1,14 +1,7 @@
 import http from "axios";
 import { from, Observable } from "rxjs";
-import {
-  catchError,
-  filter,
-  map,
-  mergeMap,
-  switchMap,
-  tap,
-} from "rxjs/operators";
-import { YTS_BASE_URL, fetch } from "../../other/other";
+import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import { YTS_BASE_URL } from "../../other/other";
 
 // type definitions
 type YTSMovie = {
@@ -47,10 +40,17 @@ type YTSResponse = {
   data: { data: { movies: YTSMovie[] } & { movie: YTSMovie } };
 };
 
+type YTSMovieWrapper = {
+  data: YTSMovie;
+  index: number;
+  isLast: boolean;
+};
+
+type AsyncYTSMovie = Observable<YTSMovieWrapper>;
+
 //makes request to YTS API and map to movies Array using type()
 function httpGet(apiPath: string): Observable<YTSMovie[]> {
   const url = YTS_BASE_URL + apiPath;
-  // return fetch<YTSResponse>(url).pipe(map(type));
   return from(http.get(url)).pipe(
     map(type),
     catchError(() => [])
