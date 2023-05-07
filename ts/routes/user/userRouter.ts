@@ -44,6 +44,11 @@ router.get("/verifyUsername/:username", async (req, res) => {
 
 router.post("/login", [usernameExists, verifyPassword, generateToken]);
 
+router.post("/logout", (req: Request, res: Response) => {
+  res.clearCookie("jwt");
+  res.status(200).send({ message: "logged out" });
+});
+
 router.get("/list", [authSession], async (req: Request, res: Response) => {
   const { id } = req.user;
   const userList = await User.findOne({ _id: id }, { shows_list: 1 });

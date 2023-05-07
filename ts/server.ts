@@ -1,11 +1,10 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { Express } from "express";
-import { appConfig } from "./other/config";
 import { authRouter } from "./routes/auth/authRouter";
 import { moviesRouter } from "./routes/external/moviesRouter";
 import { userRouter } from "./routes/user/userRouter";
-appConfig();
+
 const app: Express = express();
 
 app.use([
