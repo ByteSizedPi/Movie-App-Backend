@@ -45,7 +45,7 @@ const Review = new Schema({
 const Movie = new Schema({
   yts_id: { type: Number },
   tmdb_id: { type: Number },
-  imdb_id: { type: Number },
+  imdb_id: { type: String },
 
   budget: { type: Number },
   description_full: { type: String },
