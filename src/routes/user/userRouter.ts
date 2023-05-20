@@ -29,7 +29,7 @@ router.post('/register', async (req, res) => {
 			lastName,
 		});
 		res.status(201).send({ message: 'user created successfully' });
-	} catch ({ message }) {
+	} catch ({ message }: any) {
 		res.status(500).send({ error: message });
 	}
 });
@@ -70,7 +70,7 @@ router.post('/list', [authSession_], async (req: Request, res: Response) => {
 		);
 		if (!result) return res.status(400).send({ error: 'user not found' });
 		res.status(200).send({ message: 'show added to list' });
-	} catch ({ message }) {
+	} catch ({ message }: any) {
 		res.status(500).send({ error: message });
 	}
 });
@@ -88,7 +88,7 @@ router.delete(
 			);
 			if (!result) return res.status(400).send({ error: 'user not found' });
 			res.status(200).send({ message: 'show removed from list' });
-		} catch ({ message }) {
+		} catch ({ message }: any) {
 			res.status(500).send({ error: message });
 		}
 	}

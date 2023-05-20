@@ -25,7 +25,7 @@ export async function usernameExists_(
 		if (!results) return res.status(401).json('Username not found');
 		if (next) next();
 		else res.status(200).json({ username });
-	} catch ({ message: error }) {
+	} catch ({ message: error }: any) {
 		res.status(500).send({ error });
 	}
 }
@@ -51,7 +51,7 @@ export async function verifyPassword_(
 
 		if (next) next();
 		else res.status(200).json({ username });
-	} catch ({ message: error }) {
+	} catch ({ message: error }: any) {
 		res.status(500).send({ error });
 	}
 }
@@ -98,7 +98,7 @@ export async function authSession_(
 		const verified = jwt.verify(token, 'secret');
 		req.user = verified;
 		next();
-	} catch ({ message }) {
+	} catch ({ message }: any) {
 		res.status(400).json({ error: message });
 	}
 }
