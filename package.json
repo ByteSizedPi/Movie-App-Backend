@@ -2,11 +2,11 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "src/server.ts",
   "scripts": {
-    "start": "NODE_PATH=./build node build/index.js",
+    "start": "NODE_PATH=./build node build/server.js",
     "build": "tsc -p .",
-    "dev": "nodemon server.ts"
+    "dev": "nodemon src/server.ts"
   },
   "author": "Johan Venter",
   "license": "ISC",
