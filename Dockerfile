@@ -1,8 +1,6 @@
-# From which image we want to build from. Here we use the latest LTS (long term support) version boron of node available from the Docker Hub:
 FROM node:alpine
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 COPY . .
-EXPOSE 3000
-CMD nodemon server.ts
+CMD ["npm", "run", "dev"]
