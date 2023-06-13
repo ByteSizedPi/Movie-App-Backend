@@ -1,9 +1,11 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Express } from 'express';
-import { authRouter } from './routes/auth/authRouter';
-import { moviesRouter } from './routes/external/moviesRouter';
-import { userRouter } from './routes/user/userRouter';
+import morgan from 'morgan';
+import './config/db.config';
+import { authRouter } from './routes/authRouter';
+// import { moviesRouter } from './routes/external/moviesRouter';
+import { userRouter } from './routes/userRouter';
 
 const app: Express = express();
 
@@ -15,10 +17,11 @@ app.use([
 		credentials: true,
 	}),
 	cookieParser(),
+	morgan('dev'),
 ]);
 
 app.use('/auth', authRouter);
-app.use('/movies', moviesRouter);
+// app.use('/movies', moviesRouter);
 app.use('/user', userRouter);
 
 const port = process.env.PORT || 3000;

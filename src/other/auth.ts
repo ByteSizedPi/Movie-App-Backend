@@ -1,7 +1,7 @@
 import { serialize } from 'cookie';
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import User from '../models/User';
+import User from '../models/UserSchema';
 //middleware
 const generateToken = (
 	{ body: { username } }: Request,
@@ -48,4 +48,3 @@ const userExists = async (
 };
 
 export { userExists, generateToken, authRequest };
-// export { generateToken, authRequest };

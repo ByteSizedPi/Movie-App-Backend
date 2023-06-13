@@ -1,73 +1,68 @@
-import { Schema } from "mongoose";
+import { Observable } from 'rxjs';
+import { TMDBMovie } from './TMDB';
+import { YTSMovie } from './YTS';
 
-const Provider = new Schema({
-  logo_path: { type: String },
-  provider_name: { type: String },
-});
+type Review = {
+	author: string;
+	author_details: {
+		name: string;
+		username: string;
+		avatar_path: string;
+		rating: string;
+	};
+	content: string;
+	created_at: string;
+	id: string;
+	updated_at: string;
+	url: string;
+};
 
-const Cast = new Schema({
-  name: { type: String },
-  character_name: { type: String },
-  url_small_image: { type: String },
-  imdb_code: { type: String },
-});
+export type Movie = {
+	yts_id: number;
+	tmdb_id: number;
+	imdb_id: string;
 
-const Torrent = new Schema({
-  url: { type: String },
-  hash: { type: String },
-  quality: { type: String },
-  type: { type: String },
-  seeds: { type: Number },
-  peers: { type: Number },
-  size: { type: String },
-  size_bytes: { type: Number },
-  date_uploaded: { type: String },
-  date_uploaded_unix: { type: Number },
-});
+	budget: number;
+	description_full: string;
+	genres: string[];
+	language: string;
+	mpa_rating: string;
+	providers: {
+		logo_path: string;
+		provider_name: string;
+	}[];
+	rating: number;
+	revenue: number;
+	reviews: Review[];
+	runtime: number;
+	summary: string;
+	title: string;
+	year: number;
+	yt_trailer: string;
 
-const Review = new Schema({
-  author: { type: String },
-  author_details: {
-    type: new Schema({
-      name: { type: String },
-      username: { type: String },
-      avatar_path: { type: String },
-      rating: { type: String },
-    }),
-  },
-  content: { type: String },
-  created_at: { type: String },
-  id: { type: String },
-  updated_at: { type: String },
-  url: { type: String },
-});
+	poster: string;
+	backdrop: string;
 
-const Movie = new Schema({
-  yts_id: { type: Number },
-  tmdb_id: { type: Number },
-  imdb_id: { type: String },
+	cast: {
+		name: string;
+		character_name: string;
+		url_small_image?: string;
+		imdb_code: string;
+	}[];
 
-  budget: { type: Number },
-  description_full: { type: String },
-  genres: { type: [String] },
-  language: { type: String },
-  mpa_rating: { type: String },
-  providers: { type: [Provider] },
+	torrents: {
+		url: string;
+		hash: string;
+		quality: string;
+		type: string;
+		seeds: number;
+		peers: number;
+		size: string;
+		size_bytes: number;
+		date_uploaded: string;
+		date_uploaded_unix: number;
+	}[];
+};
 
-  runtime: { type: Number },
-  rating: { type: Number },
-  revenue: { type: Number },
-  summary: { type: String },
-  title: { type: String },
-  year: { type: Number },
-  yt_trailer: { type: String },
-
-  poster: { type: String },
-  backdrop: { type: String },
-
-  reviews: { type: [Review] },
-  cast: { type: [Cast] },
-  torrents: { type: [Torrent] },
-});
-
-export default Movie;
+export type TMDBFunc = (param?: any) => Observable<TMDBMovie>;
+export type YTSFunc = (param?: any) => Observable<YTSMovie>;

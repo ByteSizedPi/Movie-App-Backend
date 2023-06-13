@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { serialize } from 'cookie';
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import User from '../../models/User';
+import User from '../../models/UserSchema';
 
 export async function usernameExists(username: string): Promise<boolean> {
 	if (!username) return false;

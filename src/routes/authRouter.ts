@@ -8,7 +8,6 @@ router.get('', (req: Request, res: Response) => {
 	if (!token) return res.json(false);
 	try {
 		const verified = jwt.verify(token, 'secret');
-		console.log('verified:', !!verified);
 		return res.json(!!verified);
 	} catch {
 		return res.json(false);

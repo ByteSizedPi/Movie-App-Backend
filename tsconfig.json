@@ -1,9 +1,17 @@
 {
 	"compilerOptions": {
-		"target": "es6",
+		"target": "es2020",
 		"module": "commonjs",
-		"outDir": "./build",
+		"outDir": "dist",
 		"strict": true,
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"noImplicitAny": true,
+		"moduleResolution": "node",
+		"sourceMap": true,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true
+	},
+	"ts-node": {
+		"files": true
 	}
 }
