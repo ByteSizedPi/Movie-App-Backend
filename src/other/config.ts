@@ -10,4 +10,4 @@ function appConfig() {
 	db.once('open', () => console.log('connected to database'));
 }
 
-export { appConfig };
+// export { appConfig };
