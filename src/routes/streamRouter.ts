@@ -3,5 +3,5 @@ import { StreamController } from '../controllers/StreamController';
 const router = Router();
 
 router.get('/add/:infoHash', StreamController.addInfoHash);
-router.get('/stream/:infoHash', StreamController.streamHash);
+router.get('/:infoHash', StreamController.stream);
 export { router as streamRouter };

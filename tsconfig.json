@@ -9,7 +9,9 @@
 		"moduleResolution": "node",
 		"sourceMap": true,
 		"emitDecoratorMetadata": true,
-		"experimentalDecorators": true
+		"experimentalDecorators": true,
+		"strictPropertyInitialization": false,
+		"resolveJsonModule": true
 	},
 	"ts-node": {
 		"files": true

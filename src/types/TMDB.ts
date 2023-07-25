@@ -26,8 +26,16 @@ export type TMDBMovie = {
 	overview: string;
 	budget: number;
 	revenue: number;
-	reviews: Review[];
-	providers: Provider[];
+	title: string;
+	// reviews: Review[];
+	// providers: Provider[];
+};
+
+export type TMDBPartialMovie = {
+	id: number;
+	poster_path: string;
+	backdrop_path: string;
+	title: string;
 };
 
 export type TMDBResponse = {

@@ -1,8 +1,15 @@
 import http from 'axios';
 import { from, Observable } from 'rxjs';
-import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
-import { YTSMovie, YTSResponse } from '../models/YTS';
+import {
+	catchError,
+	filter,
+	map,
+	mergeMap,
+	switchMap,
+	tap,
+} from 'rxjs/operators';
 import { YTS_BASE_URL } from '../other/other';
+import { YTSMovie, YTSResponse } from '../types/YTS';
 
 export class YTSController {
 	static httpGet(apiPath: string): Observable<YTSMovie[]> {
@@ -31,11 +38,12 @@ export class YTSController {
 
 	static search = (term: string): Observable<YTSMovie> =>
 		this.httpGet(`list_movies.jsonp?query_term=${term}`).pipe(
+			tap((arr) => console.log(arr)),
 			switchMap((arr) => arr),
 			mergeMap(({ id }) => this.getById(id))
 		);
 
-	static getMovieByIMDBId = (id: number): Observable<YTSMovie> =>
+	static getMovieByIMDBId = (id: string): Observable<YTSMovie> =>
 		this.httpGet(`movie_details.jsonp?imdb_id=${id}`).pipe(
 			filter(([{ id }]) => !!id),
 			switchMap(([{ id }]) => this.getById(id))

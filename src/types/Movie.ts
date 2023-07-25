@@ -27,13 +27,13 @@ export type Movie = {
 	genres: string[];
 	language: string;
 	mpa_rating: string;
-	providers: {
-		logo_path: string;
-		provider_name: string;
-	}[];
+	// providers: {
+	// 	logo_path: string;
+	// 	provider_name: string;
+	// }[];
 	rating: number;
 	revenue: number;
-	reviews: Review[];
+	// reviews: Review[];
 	runtime: number;
 	summary: string;
 	title: string;
@@ -62,6 +62,13 @@ export type Movie = {
 		date_uploaded: string;
 		date_uploaded_unix: number;
 	}[];
+};
+
+export type PartialMovie = {
+	tmdb_id: number;
+	title: string;
+	poster: string;
+	backdrop: string;
 };
 
 export type TMDBFunc = (param?: any) => Observable<TMDBMovie>;

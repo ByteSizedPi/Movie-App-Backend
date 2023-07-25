@@ -1,8 +1,8 @@
 import http from 'axios';
 import { forkJoin, from, Observable } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
-import { Provider, Review, TMDBMovie, TMDBResponse } from '../models/TMDB';
 import { API_KEY, fetch, TMDB_BASE_URL } from '../other/other';
+import { Provider, Review, TMDBMovie, TMDBResponse } from '../types/TMDB';
 
 const KEY = `api_key=${API_KEY}`;
 const LANG = '&language=en-US';
@@ -17,13 +17,21 @@ export class TMDBController {
 	};
 
 	//all movie requests go through httpGet to return conformed results
-	static httpGet = (
+	static httpGet(
 		apiString: string,
 		imdb: string = ''
-	): Observable<TMDBMovie[]> => {
+	): Observable<TMDBMovie[]> {
 		const url = TMDB_BASE_URL + apiString + KEY + LANG + imdb;
 		return fetch<TMDBResponse>(url).pipe(map(this.type));
-	};
+	}
+
+	// get partial movie array
+	// static getGroup(query: string): Observable<PartialMovie[]> {
+	// 	const qString =
+	// 	TMDB_BASE_URL+
+	// 		query === 'trending' ? `trending/all/week?` : `movie/${query}?`+ KEY + LANG;
+	// 	return fetch<TMDBResponse>(TMDB_BASE_URL + qString + KEY).pipe(map({results}))
+	// }
 
 	//additional get requests for movie related queries
 	static httpGetReviews = (apiString: string): Observable<Review[]> =>

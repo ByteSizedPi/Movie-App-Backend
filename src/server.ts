@@ -2,6 +2,8 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Express } from 'express';
 import morgan from 'morgan';
+import * as swaggerUI from 'swagger-ui-express';
+import swaggerDocument from '../swagger.json';
 import './config/db.config';
 import { authRouter } from './routes/authRouter';
 import { moviesRouter } from './routes/moviesRouter';
@@ -20,6 +22,9 @@ app.use([
 	cookieParser(),
 	morgan('dev'),
 ]);
+
+app.use('/api-docs', swaggerUI.serve);
+app.get('/api-docs', swaggerUI.setup(swaggerDocument));
 
 app.use('/auth', authRouter);
 app.use('/movies', moviesRouter);

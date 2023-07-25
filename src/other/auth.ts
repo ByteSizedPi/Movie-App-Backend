@@ -47,4 +47,4 @@ const userExists = async (
 	}
 };
 
-export { userExists, generateToken, authRequest };
+export { authRequest, generateToken, userExists };

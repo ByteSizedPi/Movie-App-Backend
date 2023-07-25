@@ -27,8 +27,9 @@ export function TryCatch(): MethodDecorator {
 			next?: NextFunction
 		): Promise<any> {
 			try {
-				await originalMethod.apply(this, [req, res, next]);
+				return await originalMethod.apply(this, [req, res, next]);
 			} catch ({ message: error }: any) {
+				console.log(error);
 				return res.status(500).send({ error });
 			}
 		};
