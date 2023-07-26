@@ -27,6 +27,11 @@ export type TMDBMovie = {
 	budget: number;
 	revenue: number;
 	title: string;
+	genres: { name: string }[];
+	release_date: string;
+	runtime: number;
+	status: string;
+	vote_average: number;
 	// reviews: Review[];
 	// providers: Provider[];
 };

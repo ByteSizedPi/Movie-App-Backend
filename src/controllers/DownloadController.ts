@@ -12,24 +12,26 @@ const findMP4 = (torrent: WebTorrent.Torrent): WebTorrent.TorrentFile =>
 		name.endsWith('.mp4')
 	) as WebTorrent.TorrentFile;
 
-export class StreamController {
+export class DownloadController {
 	@TryCatch()
 	static addInfoHash({ params: { infoHash } }: Request, res: Response) {
-		const torrent = buildMagnetURI(infoHash);
+		return new Promise((resolve, reject) => {
+			const torrent = buildMagnetURI(infoHash);
 
-		if (client.get(torrent)) {
-			console.log(`Existing torrent: ${torrent}. Requested`);
-			return res.status(201).send({ msg: 'Existing hash!' });
-		}
+			if (client.get(torrent)) {
+				console.log(`Existing torrent: ${infoHash}. Requested`);
+				return resolve(infoHash);
+			}
 
-		client.add(torrent, () => {
-			console.log('torrent added');
-			return res.status(201).send({ msg: 'Hash added successfully!' });
+			client.add(torrent, () => {
+				console.log('download added');
+				resolve(infoHash);
+			});
 		});
 	}
 
 	@TryCatch()
-	static async stream({ params: { infoHash } }: Request, res: Response) {
+	static async download({ params: { infoHash } }: Request, res: Response) {
 		const torrent = client.get(infoHash);
 		if (!torrent) return res.status(404).send({ msg: 'Hash not found!' });
 
@@ -39,8 +41,11 @@ export class StreamController {
 			'Content-Length': file.length,
 			'Content-Type': 'video/mp4',
 		});
+
+		console.log('sending file');
+
 		file.createReadStream().pipe(res);
 
-		res.on('close', () => console.log('stream ended'));
+		res.on('close', () => console.log('download ended'));
 	}
 }

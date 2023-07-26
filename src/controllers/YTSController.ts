@@ -1,13 +1,6 @@
 import http from 'axios';
-import { from, Observable } from 'rxjs';
-import {
-	catchError,
-	filter,
-	map,
-	mergeMap,
-	switchMap,
-	tap,
-} from 'rxjs/operators';
+import { from, Observable, of } from 'rxjs';
+import { catchError, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { YTS_BASE_URL } from '../other/other';
 import { YTSMovie, YTSResponse } from '../types/YTS';
 
@@ -43,9 +36,10 @@ export class YTSController {
 			mergeMap(({ id }) => this.getById(id))
 		);
 
-	static getMovieByIMDBId = (id: string): Observable<YTSMovie> =>
+	static getMovieByIMDBId = (id: string): Observable<YTSMovie | null> =>
 		this.httpGet(`movie_details.jsonp?imdb_id=${id}`).pipe(
-			filter(([{ id }]) => !!id),
-			switchMap(([{ id }]) => this.getById(id))
+			// map(([movie]) => movie.id ? movie : null)),
+			// filter(([{ id }]) => !!id),
+			switchMap(([{ id }]) => (id > 0 ? this.getById(id) : of(null)))
 		);
 }

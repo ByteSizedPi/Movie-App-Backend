@@ -18,39 +18,40 @@ type Review = {
 };
 
 export type Movie = {
-	yts_id: number;
+	yts_id?: number;
 	tmdb_id: number;
 	imdb_id: string;
 
 	budget: number;
 	description_full: string;
 	genres: string[];
-	language: string;
-	mpa_rating: string;
-	// providers: {
-	// 	logo_path: string;
-	// 	provider_name: string;
-	// }[];
-	rating: number;
+	language?: string;
+	mpa_rating?: string;
+	providers?: {
+		logo_path: string;
+		provider_name: string;
+	}[];
+	imdb_rating?: number;
+	other_rating: number;
 	revenue: number;
-	// reviews: Review[];
+	reviews?: Review[];
 	runtime: number;
 	summary: string;
 	title: string;
-	year: number;
-	yt_trailer: string;
+	release_date: string;
+	yt_trailer?: string;
 
 	poster: string;
 	backdrop: string;
 
-	cast: {
+	cast?: {
 		name: string;
 		character_name: string;
 		url_small_image?: string;
 		imdb_code: string;
 	}[];
 
-	torrents: {
+	torrents?: {
 		url: string;
 		hash: string;
 		quality: string;
