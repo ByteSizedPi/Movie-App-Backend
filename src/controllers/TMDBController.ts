@@ -1,96 +1,67 @@
-import http from 'axios';
-import { forkJoin, from, Observable } from 'rxjs';
-import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
-import { API_KEY, fetch, TMDB_BASE_URL } from '../other/other';
-import { Provider, Review, TMDBMovie, TMDBResponse } from '../types/TMDB';
-
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { API_KEY, TMDB_BASE_URL, fetch } from '../other/other';
+import { PartialMovie } from '../types/Movie';
+import { TMDBMovie, TMDBPartialMovie } from '../types/TMDB';
 const KEY = `api_key=${API_KEY}`;
 const LANG = '&language=en-US';
 
-export class TMDBController {
-	//determine TMDB return type and reduce to TMDBMovie array
-	static type = ({ data }: TMDBResponse): TMDBMovie[] => {
-		if (data.results) return data.results;
-		if (data.id) return [data];
-		if (data.movie_results) return data.movie_results;
-		return [];
+export namespace TMDBResponse {
+	export type MoviesGroup = {
+		data: { results: TMDBPartialMovie[] };
 	};
+	export type MovieByTMDBID = {
+		data: TMDBMovie;
+	};
+}
 
-	//all movie requests go through httpGet to return conformed results
-	static httpGet(
-		apiString: string,
-		imdb: string = ''
-	): Observable<TMDBMovie[]> {
+export namespace TMDBController {
+	function httpGet<T>(apiString: string, imdb: string = ''): Observable<T> {
 		const url = TMDB_BASE_URL + apiString + KEY + LANG + imdb;
-		return fetch<TMDBResponse>(url).pipe(map(this.type));
+		return fetch<T>(url);
 	}
 
-	// get partial movie array
-	// static getGroup(query: string): Observable<PartialMovie[]> {
-	// 	const qString =
-	// 	TMDB_BASE_URL+
-	// 		query === 'trending' ? `trending/all/week?` : `movie/${query}?`+ KEY + LANG;
-	// 	return fetch<TMDBResponse>(TMDB_BASE_URL + qString + KEY).pipe(map({results}))
-	// }
+	function GroupToPartial({
+		data: { results },
+	}: TMDBResponse.MoviesGroup): PartialMovie[] {
+		return results.map((movie) => ({
+			tmdb_id: movie.id,
+			poster: movie.poster_path,
+			backdrop: movie.backdrop_path,
+			title: movie.title,
+		}));
+	}
 
-	//additional get requests for movie related queries
-	static httpGetReviews = (apiString: string): Observable<Review[]> =>
-		from(http.get(TMDB_BASE_URL + apiString + KEY)).pipe(
-			map(({ data: { results } }) => results),
-			catchError(() => [])
+	// get partial movie array by Group type
+	export function getGroup(query: string): Observable<PartialMovie[]> {
+		const qString =
+			query === 'trending' ? `trending/all/week?` : `movie/${query}?`;
+
+		return httpGet<TMDBResponse.MoviesGroup>(qString).pipe(map(GroupToPartial));
+	}
+
+	export function searchMovie(query: string): Observable<PartialMovie[]> {
+		return httpGet<TMDBResponse.MoviesGroup>(
+			`search/movie?query=${query}&`
+		).pipe(map(GroupToPartial));
+	}
+
+	//get full movie by tmdb id
+	export function getMovieByTMDBId(id: number): Observable<TMDBMovie> {
+		return httpGet<TMDBResponse.MovieByTMDBID>(`movie/${id}?`).pipe(
+			map(({ data }) => data)
 		);
+	}
 
-	static httpGetProviders = (apiString: string): Observable<Provider[]> =>
-		from(http.get(TMDB_BASE_URL + apiString + KEY)).pipe(
-			map(({ data: { results } }) => results.US?.flatrate ?? []),
-			catchError(() => [])
+	export function getRecommended(id: number): Observable<PartialMovie[]> {
+		return httpGet<TMDBResponse.MoviesGroup>(
+			`movie/${id}/recommendations?`
+		).pipe(map(GroupToPartial));
+	}
+
+	export function getSimilar(id: number): Observable<PartialMovie[]> {
+		return httpGet<TMDBResponse.MoviesGroup>(`movie/${id}/similar?`).pipe(
+			map(GroupToPartial)
 		);
-
-	//get movie array by Group type
-	static getMovieGroup = (query: string): Observable<TMDBMovie> =>
-		this.getFull(
-			query === 'trending' ? `trending/all/week?` : `movie/${query}?`
-		);
-
-	//get recommended for specific movie
-	static getRecommended = (id: number): Observable<TMDBMovie> =>
-		this.getFull(`movie/${id}/recommendations?`);
-
-	//get recommended for specific movie
-	static getSimilar = (id: number): Observable<TMDBMovie> =>
-		this.getFull(`movie/${id}/similar?`);
-
-	//get Movie array (by group) then send each movie to getById
-	static getFull = (queryGroup: string): Observable<TMDBMovie> =>
-		this.httpGet(queryGroup).pipe(
-			switchMap((arr) => arr),
-			mergeMap(({ id }) => this.getById(id))
-		);
-
-	//get full movie, reviews and providers then combine into object
-	static getById = (id: number): Observable<TMDBMovie> => {
-		// console.log(id);
-		return forkJoin([
-			this.httpGet(`movie/${id}?`),
-			this.httpGetReviews(`movie/${id}/reviews?`),
-			this.httpGetProviders(`movie/${id}/watch/providers?`),
-		]).pipe(
-			// tap((r) => console.log(r)),
-			filter((movie) => !!movie[0]),
-			map(([movie, reviews, providers]) => {
-				return {
-					...movie[0],
-					reviews: reviews,
-					providers: providers,
-				};
-			})
-		);
-	};
-
-	//when searched by imdb_id, since limited results are returned, pass to getById for full results
-	static getMovieByIMDBId = (id: string): Observable<TMDBMovie> => {
-		return this.httpGet(`find/${id}?`, '&external_source=imdb_id').pipe(
-			switchMap(([{ id }]) => this.getById(id))
-		);
-	};
+	}
 }
