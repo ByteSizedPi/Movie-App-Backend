@@ -11,10 +11,8 @@ const router = Router();
 router.get('/search=:query', MovieController.getSearch);
 router.get('/group=:group', MovieController.getGroup);
 router.get('/tmdbid=:tmdb_id', MovieController.getMovieByTMDBId);
-router.get('/download=:infoHash', async (req, res) => {
-	await DownloadController.addInfoHash(req, res);
-	DownloadController.download(req, res);
-});
+// router.get('/download=:infoHash', DownloadController.download);
+router.get('/stream=:infoHash', DownloadController.stream);
 router.get('/recommended=:tmdb_id', MovieController.getRecommended);
 router.get('/similar=:tmdb_id', MovieController.getSimilar);
 

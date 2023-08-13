@@ -3,3 +3,4 @@ mongo.md
 /.env
 dist
 /.vscode
+/public/
